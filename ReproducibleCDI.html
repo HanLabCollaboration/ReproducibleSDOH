@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReproducibleCDI Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,500;1,500&display=swap">
+
+<style>
+  :root {
+    /* palette — shared with the other ReproducibleX pipeline figures */
+    --ground:        #ffffff;
+    --panel:         #f4f7f8;
+    --ink:           #14202b;
+    --ink-soft:      #4a5b68;
+    --box:           #1f3a5c;
+    --box-edge:      #16293f;
+    --box-ink:       #ffffff;
+    --box-sub:       #c6d4e2;
+    --box-fn:        #8fb9e0;
+    --teal:          #2b7f92;
+    --teal-deep:     #1d6675;
+    --banner-bg:     #eaf5f3;
+    --banner-edge:   #6fb3ae;
+    --chip:          #9aa7b4;
+    --chip-ink:      #ffffff;
+    --arrow:         #3d72b0;
+    --optional:      #e07f2c;
+    --hair:          #d9e1e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #0e1620;
+      --panel:         #16212d;
+      --ink:           #eef3f6;
+      --ink-soft:      #9fb0bd;
+      --box:           #22456b;
+      --box-edge:      #35618d;
+      --box-ink:       #ffffff;
+      --box-sub:       #c1d3e4;
+      --box-fn:        #9cc6ec;
+      --teal:          #4fb3c6;
+      --teal-deep:     #6ecad9;
+      --banner-bg:     #12303a;
+      --banner-edge:   #2f7d8c;
+      --chip:          #62748a;
+      --chip-ink:      #ffffff;
+      --arrow:         #6a9fd6;
+      --optional:      #f0954a;
+      --hair:          #263543;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:        #0e1620;
+    --panel:         #16212d;
+    --ink:           #eef3f6;
+    --ink-soft:      #9fb0bd;
+    --box:           #22456b;
+    --box-edge:      #35618d;
+    --box-ink:       #ffffff;
+    --box-sub:       #c1d3e4;
+    --box-fn:        #9cc6ec;
+    --teal:          #4fb3c6;
+    --teal-deep:     #6ecad9;
+    --banner-bg:     #12303a;
+    --banner-edge:   #2f7d8c;
+    --chip:          #62748a;
+    --chip-ink:      #ffffff;
+    --arrow:         #6a9fd6;
+    --optional:      #f0954a;
+    --hair:          #263543;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 52px);
+  }
+
+  .sheet { max-width: 1360px; margin: 0 auto; }
+
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* ---------- page header ---------- */
+  .page-head { margin-bottom: clamp(24px, 4vw, 40px); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-family: "Barlow Semi Condensed", "Inter", sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.6vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--teal);
+    margin: 0 0 12px;
+  }
+  h1 .light { color: var(--ink); font-weight: 600; }
+  .intro {
+    max-width: 68ch;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .intro code { color: var(--ink); font-size: 13.5px; }
+
+  /* ---------- comparison table ---------- */
+  .compare-wrap {
+    overflow-x: auto;
+    margin: 28px 0 0;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  table.compare {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  .compare th, .compare td {
+    text-align: left;
+    vertical-align: top;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .compare tr:last-child th, .compare tr:last-child td { border-bottom: 0; }
+  .compare thead th {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--teal-deep);
+  }
+  .compare thead th a { color: inherit; text-decoration: none; border-bottom: 1.5px solid transparent; }
+  .compare thead th a:hover, .compare thead th a:focus-visible { border-bottom-color: currentColor; outline: none; }
+  .compare tbody th {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    width: 130px;
+    white-space: nowrap;
+  }
+  .compare td { color: var(--ink); }
+  .compare td code { font-size: 12.5px; color: var(--teal-deep); }
+  .compare .num-cell { font-variant-numeric: tabular-nums; }
+
+  /* ---------- method sections ---------- */
+  .method {
+    margin-top: clamp(44px, 6vw, 72px);
+    padding-top: clamp(28px, 4vw, 40px);
+    border-top: 1px solid var(--hair);
+    scroll-margin-top: 16px;
+  }
+  .method-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px 32px;
+    margin-bottom: 8px;
+  }
+  .method-title { min-width: 240px; }
+  .method-title h2 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 3.6vw, 36px);
+    line-height: 1.05;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .method-title .call {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .banner {
+    flex: 1 1 440px;
+    max-width: 660px;
+    background: var(--banner-bg);
+    border: 1.5px solid var(--banner-edge);
+    border-radius: 10px;
+    padding: 14px 20px;
+  }
+  .banner .lead {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--teal-deep);
+    font-size: 15px;
+    margin: 0 0 5px;
+  }
+  .banner .lead span { color: var(--ink-soft); font-weight: 500; }
+  .banner p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
+  .banner code { color: var(--ink); font-size: 12.5px; }
+  .formula {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ---------- flow ---------- */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    padding: 34px 12px 12px;
+  }
+
+  .step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 168px;
+    background: var(--box);
+    border: 1px solid var(--box-edge);
+    border-radius: 10px;
+    padding: 26px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    box-shadow: 0 10px 24px -16px rgba(10, 25, 45, 0.55);
+  }
+  .num {
+    position: absolute;
+    top: -15px;
+    left: -11px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--chip);
+    color: var(--chip-ink);
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 3px 8px -2px rgba(0, 0, 0, 0.35);
+  }
+  .step h3 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.05;
+    color: var(--box-ink);
+    margin: 2px 0 0;
+    text-wrap: balance;
+  }
+  .fn {
+    font-family: "JetBrains Mono", monospace;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--box-fn);
+    overflow-wrap: anywhere;
+  }
+  .desc {
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--box-sub);
+    margin: auto 0 0;
+  }
+  .desc b { color: var(--box-ink); font-weight: 600; }
+
+  .arrow {
+    flex: 0 0 32px;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    color: var(--arrow);
+  }
+  .arrow svg { width: 24px; height: 20px; display: block; }
+
+  /* optional (dashed orange) group */
+  .optional-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 188px;
+    border: 2px dashed var(--optional);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    align-items: stretch;
+  }
+  .optional-wrap .step { box-shadow: none; }
+  .optional-pill {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    background: var(--optional);
+    color: #ffffff;
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* per-scope-group bracket (Messer / Powell-Wiley) */
+  .scope-run {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex: 3 1 0;
+    padding-bottom: 46px;
+  }
+  .scope-run.w4 { flex-grow: 4; }
+  .scope-run::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 22px;
+    height: 12px;
+    border: 2px solid var(--teal);
+    border-top: 0;
+    border-radius: 0 0 7px 7px;
+  }
+  .scope-label {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12.5px;
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+  .scope-label code { font-weight: 500; font-size: 12px; }
+  /* keep arrows outside the bracket vertically aligned with boxes */
+  .flow > .arrow { margin-bottom: 0; }
+  .flow.has-scope > .arrow { margin-bottom: 46px; }
+  .flow.has-scope > .step { margin-bottom: 46px; }
+
+  /* ---------- variable legend ---------- */
+  .legend {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 8px 26px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--hair);
+  }
+  .legend div { font-size: 12.5px; line-height: 1.4; color: var(--ink-soft); }
+  .legend code { color: var(--teal-deep); font-size: 12px; margin-right: 6px; }
+  .notes {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 110ch;
+  }
+  .notes li::before { content: "Deviation from ndi · "; color: var(--optional); font-weight: 600; }
+  .notes code { color: var(--ink); font-size: 12px; }
+  .src {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .page-foot {
+    margin-top: clamp(40px, 6vw, 64px);
+    padding-top: 16px;
+    border-top: 1px solid var(--hair);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .page-foot code { color: var(--ink); font-size: 12px; }
+
+  /* ---------- narrow screens: stack vertically ---------- */
+  @media (max-width: 760px) {
+    .flow, .scope-run { flex-direction: column; }
+    .flow { padding: 24px 12px 8px; }
+    .step, .optional-wrap { min-width: 0; }
+    .arrow { flex-basis: 30px; transform: rotate(90deg); }
+    .flow.has-scope > .arrow, .flow.has-scope > .step { margin-bottom: 0; }
+    .scope-label { white-space: normal; width: 100%; text-align: center; }
+  }
+</style>
+<style>
+  .notes li::before { content: attr(data-tag) " · "; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="page-head">
+    <p class="eyebrow">tidySDOH · package pipelines</p>
+    <h1>Reproducible<span class="light">CDI</span></h1>
+    <p class="intro">
+      The Community Deprivation Index follows the Singh / Area Deprivation Index method and adds % uninsured, for 18 ACS variables in total. It is built natively at block group, and higher scores mean more deprivation.
+      <code>computeCDI()</code> builds it from the Census API.
+    </p>
+  </header>
+
+  <section class="method" id="cdi">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">Robst et al. 2024</p>
+        <h2>Community Deprivation Index</h2>
+        <span class="call">computeCDI()</span>
+      </div>
+      <div class="banner">
+        <p class="lead">Scope: <span>national | state</span> · Years: <span>2016+</span></p>
+        <p>Imputation, standardization, PCA and ranking run separately within each scope group.
+          <code>"state"</code> scope takes effect only when more than one state is requested.
+          The household-internet table (<code>B28002</code>) isn't published before 2016.</p>
+      </div>
+    </div>
+
+    <div class="flow has-scope">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Fetch ACS Data</h3>
+        <span class="fn">fetchCDIAcs()</span>
+        <p class="desc">18 variables from detailed <b>B/C tables</b> only, so block group works. Includes B27010 (insurance) and B28002 (internet). Names split by <b>cleanAcsNamesCDI()</b></p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Compute 18 Variables</h3>
+        <span class="fn">calculateCDIVars()</span>
+        <p class="desc">Definitions follow the <b>CMS SAS reference</b>. Zero denominator → 0. Census jam codes on medians → NA</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="scope-run w4">
+        <div class="optional-wrap">
+          <span class="optional-pill">Optional</span>
+          <div class="step">
+            <span class="num">3</span>
+            <h3>Impute</h3>
+            <span class="fn">imputeMissing()</span>
+            <p class="desc">Spatial mean over <b>Queen-contiguity</b> neighbors, weighted by <b>tot_pop</b> (default) or unweighted</p>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">4</span>
+          <h3>Standardize</h3>
+          <span class="fn">scale()</span>
+          <p class="desc">Complete cases only. All <b>18 variables z-scored</b> (mean 0, SD 1) within the scope group</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">5</span>
+          <h3>PCA Weights</h3>
+          <span class="fn">psych::principal()</span>
+          <p class="desc">1 component. Its <b>loadings are the weights W</b>, and the composite is <b>S = Z · W</b>. Sign flipped so fam_bel_pov loads positive</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">6</span>
+          <h3>Rescale &amp; Rank</h3>
+          <span class="fn">processCDIScope()</span>
+          <p class="desc"><b>CDI_std</b> rescaled to mean 100, SD 20. <b>our_CDI</b> = percentile 1–100</p>
+        </div>
+
+        <span class="scope-label">Runs once per scope group in <code>processCDIScope()</code></span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div><code>educ_12less</code>less than 12th grade (25+)</div>
+      <div><code>educ_ba_pl</code>bachelor's degree or higher</div>
+      <div><code>emp_white_col</code>white-collar occupations</div>
+      <div><code>fam_bel_pov</code>families below poverty</div>
+      <div><code>pop_bel_150_pov</code>population below 150% of poverty</div>
+      <div><code>unemp</code>unemployed, of total labor force</div>
+      <div><code>inc_dis_upd</code>income disparity: log(100 × low-income ÷ high-income households)</div>
+      <div><code>med_hhld_inc</code>median household income</div>
+      <div><code>med_home_val</code>median home value</div>
+      <div><code>med_gross_rent</code>median gross rent</div>
+      <div><code>med_month_mort</code>median monthly mortgage</div>
+      <div><code>own_occ_hous</code>owner-occupied housing</div>
+      <div><code>one_par_hhld</code>single-parent households</div>
+      <div><code>hhld_1pl_room</code>more than 1 person per room</div>
+      <div><code>hhld_no_veh</code>households without a vehicle</div>
+      <div><code>hhld_no_int</code>households without internet</div>
+      <div><code>hous_no_plumb</code>incomplete plumbing</div>
+      <div><code>no_ins</code>uninsured population</div>
+    </div>
+    <ul class="notes">
+      <li data-tag="Deviation from CMS">Missing values are filled by spatial queen-neighbor imputation, not the CMS hierarchy (block group → tract → county → state).</li>
+      <li data-tag="Deviation from CMS">There is no MOE-based empirical Bayes shrinkage and no low-population or group-quarters suppression. This is the "standardized index without shrinkage".</li>
+      <li data-tag="Weights">CMS uses factor-score coefficients and this package uses loadings. With 1 component they are proportional, so the ranks after rescaling are the same.</li>
+    </ul>
+    <p class="src">Robst J et&nbsp;al. 2024, Health Aff Sch qxae161 · CMS reference: github.com/CMSgov/community-deprivation-index</p>
+  </section>
+
+  <footer class="page-foot">
+    Every geography gets an <code>annotation</code>: Complete data · Imputation completed · Imputation incomplete · PCA failed · No population.
+    Geographies with zero population are dropped before modeling and added back with an NA score.
+  </footer>
+
+</div>
+</body>
+</html>

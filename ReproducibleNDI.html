@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReproducibleNDI Pipelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,500;1,500&display=swap">
+
+<style>
+  :root {
+    /* palette — shared with the other ReproducibleX pipeline figures */
+    --ground:        #ffffff;
+    --panel:         #f4f7f8;
+    --ink:           #14202b;
+    --ink-soft:      #4a5b68;
+    --box:           #1f3a5c;
+    --box-edge:      #16293f;
+    --box-ink:       #ffffff;
+    --box-sub:       #c6d4e2;
+    --box-fn:        #8fb9e0;
+    --teal:          #2b7f92;
+    --teal-deep:     #1d6675;
+    --banner-bg:     #eaf5f3;
+    --banner-edge:   #6fb3ae;
+    --chip:          #9aa7b4;
+    --chip-ink:      #ffffff;
+    --arrow:         #3d72b0;
+    --optional:      #e07f2c;
+    --hair:          #d9e1e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #0e1620;
+      --panel:         #16212d;
+      --ink:           #eef3f6;
+      --ink-soft:      #9fb0bd;
+      --box:           #22456b;
+      --box-edge:      #35618d;
+      --box-ink:       #ffffff;
+      --box-sub:       #c1d3e4;
+      --box-fn:        #9cc6ec;
+      --teal:          #4fb3c6;
+      --teal-deep:     #6ecad9;
+      --banner-bg:     #12303a;
+      --banner-edge:   #2f7d8c;
+      --chip:          #62748a;
+      --chip-ink:      #ffffff;
+      --arrow:         #6a9fd6;
+      --optional:      #f0954a;
+      --hair:          #263543;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:        #0e1620;
+    --panel:         #16212d;
+    --ink:           #eef3f6;
+    --ink-soft:      #9fb0bd;
+    --box:           #22456b;
+    --box-edge:      #35618d;
+    --box-ink:       #ffffff;
+    --box-sub:       #c1d3e4;
+    --box-fn:        #9cc6ec;
+    --teal:          #4fb3c6;
+    --teal-deep:     #6ecad9;
+    --banner-bg:     #12303a;
+    --banner-edge:   #2f7d8c;
+    --chip:          #62748a;
+    --chip-ink:      #ffffff;
+    --arrow:         #6a9fd6;
+    --optional:      #f0954a;
+    --hair:          #263543;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 52px);
+  }
+
+  .sheet { max-width: 1360px; margin: 0 auto; }
+
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* ---------- page header ---------- */
+  .page-head { margin-bottom: clamp(24px, 4vw, 40px); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-family: "Barlow Semi Condensed", "Inter", sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.6vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--teal);
+    margin: 0 0 12px;
+  }
+  h1 .light { color: var(--ink); font-weight: 600; }
+  .intro {
+    max-width: 68ch;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .intro code { color: var(--ink); font-size: 13.5px; }
+
+  /* ---------- comparison table ---------- */
+  .compare-wrap {
+    overflow-x: auto;
+    margin: 28px 0 0;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  table.compare {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  .compare th, .compare td {
+    text-align: left;
+    vertical-align: top;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .compare tr:last-child th, .compare tr:last-child td { border-bottom: 0; }
+  .compare thead th {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--teal-deep);
+  }
+  .compare thead th a { color: inherit; text-decoration: none; border-bottom: 1.5px solid transparent; }
+  .compare thead th a:hover, .compare thead th a:focus-visible { border-bottom-color: currentColor; outline: none; }
+  .compare tbody th {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    width: 130px;
+    white-space: nowrap;
+  }
+  .compare td { color: var(--ink); }
+  .compare td code { font-size: 12.5px; color: var(--teal-deep); }
+  .compare .num-cell { font-variant-numeric: tabular-nums; }
+
+  /* ---------- method sections ---------- */
+  .method {
+    margin-top: clamp(44px, 6vw, 72px);
+    padding-top: clamp(28px, 4vw, 40px);
+    border-top: 1px solid var(--hair);
+    scroll-margin-top: 16px;
+  }
+  .method-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px 32px;
+    margin-bottom: 8px;
+  }
+  .method-title { min-width: 240px; }
+  .method-title h2 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 3.6vw, 36px);
+    line-height: 1.05;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .method-title .call {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .banner {
+    flex: 1 1 440px;
+    max-width: 660px;
+    background: var(--banner-bg);
+    border: 1.5px solid var(--banner-edge);
+    border-radius: 10px;
+    padding: 14px 20px;
+  }
+  .banner .lead {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--teal-deep);
+    font-size: 15px;
+    margin: 0 0 5px;
+  }
+  .banner .lead span { color: var(--ink-soft); font-weight: 500; }
+  .banner p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
+  .banner code { color: var(--ink); font-size: 12.5px; }
+  .formula {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ---------- flow ---------- */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    padding: 34px 12px 12px;
+  }
+
+  .step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 168px;
+    background: var(--box);
+    border: 1px solid var(--box-edge);
+    border-radius: 10px;
+    padding: 26px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    box-shadow: 0 10px 24px -16px rgba(10, 25, 45, 0.55);
+  }
+  .num {
+    position: absolute;
+    top: -15px;
+    left: -11px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--chip);
+    color: var(--chip-ink);
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 3px 8px -2px rgba(0, 0, 0, 0.35);
+  }
+  .step h3 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.05;
+    color: var(--box-ink);
+    margin: 2px 0 0;
+    text-wrap: balance;
+  }
+  .fn {
+    font-family: "JetBrains Mono", monospace;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--box-fn);
+    overflow-wrap: anywhere;
+  }
+  .desc {
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--box-sub);
+    margin: auto 0 0;
+  }
+  .desc b { color: var(--box-ink); font-weight: 600; }
+
+  .arrow {
+    flex: 0 0 32px;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    color: var(--arrow);
+  }
+  .arrow svg { width: 24px; height: 20px; display: block; }
+
+  /* optional (dashed orange) group */
+  .optional-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 188px;
+    border: 2px dashed var(--optional);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    align-items: stretch;
+  }
+  .optional-wrap .step { box-shadow: none; }
+  .optional-pill {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    background: var(--optional);
+    color: #ffffff;
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* per-scope-group bracket (Messer / Powell-Wiley) */
+  .scope-run {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex: 3 1 0;
+    padding-bottom: 46px;
+  }
+  .scope-run.w4 { flex-grow: 4; }
+  .scope-run::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 22px;
+    height: 12px;
+    border: 2px solid var(--teal);
+    border-top: 0;
+    border-radius: 0 0 7px 7px;
+  }
+  .scope-label {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12.5px;
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+  .scope-label code { font-weight: 500; font-size: 12px; }
+  /* keep arrows outside the bracket vertically aligned with boxes */
+  .flow > .arrow { margin-bottom: 0; }
+  .flow.has-scope > .arrow { margin-bottom: 46px; }
+  .flow.has-scope > .step { margin-bottom: 46px; }
+
+  /* ---------- variable legend ---------- */
+  .legend {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 8px 26px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--hair);
+  }
+  .legend div { font-size: 12.5px; line-height: 1.4; color: var(--ink-soft); }
+  .legend code { color: var(--teal-deep); font-size: 12px; margin-right: 6px; }
+  .notes {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 110ch;
+  }
+  .notes li::before { content: "Deviation from ndi · "; color: var(--optional); font-weight: 600; }
+  .notes code { color: var(--ink); font-size: 12px; }
+  .src {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .page-foot {
+    margin-top: clamp(40px, 6vw, 64px);
+    padding-top: 16px;
+    border-top: 1px solid var(--hair);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .page-foot code { color: var(--ink); font-size: 12px; }
+
+  /* ---------- narrow screens: stack vertically ---------- */
+  @media (max-width: 760px) {
+    .flow, .scope-run { flex-direction: column; }
+    .flow { padding: 24px 12px 8px; }
+    .step, .optional-wrap { min-width: 0; }
+    .arrow { flex-basis: 30px; transform: rotate(90deg); }
+    .flow.has-scope > .arrow, .flow.has-scope > .step { margin-bottom: 0; }
+    .scope-label { white-space: normal; width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="page-head">
+    <p class="eyebrow">tidySDOH · package pipelines</p>
+    <h1>Reproducible<span class="light">NDI</span></h1>
+    <p class="intro">
+      Three neighborhood indices from 5-year ACS data, following the <code>ndi</code> package by Ian&nbsp;D.&nbsp;Buller.
+      <code>computeNDI()</code> builds the Messer and Powell-Wiley deprivation indices, which use principal component analysis. <code>computeICE()</code> builds Krieger's Index of Concentration at the Extremes, which uses ratios instead.
+    </p>
+
+    <div class="compare-wrap">
+      <table class="compare">
+        <thead>
+          <tr>
+            <th scope="col"><span class="sr-only"></span></th>
+            <th scope="col"><a href="#messer">Messer NDI</a></th>
+            <th scope="col"><a href="#powell-wiley">Powell-Wiley NDI</a></th>
+            <th scope="col"><a href="#ice">ICE</a></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Call</th>
+            <td><code>computeNDI(type = "messer")</code></td>
+            <td><code>computeNDI(type = "powell_wiley")</code></td>
+            <td><code>computeICE()</code></td>
+          </tr>
+          <tr>
+            <th scope="row">Inputs</th>
+            <td class="num-cell">8 proportions</td>
+            <td class="num-cell">13 variables (11 %, 2 log)</td>
+            <td class="num-cell">5 ratio measures</td>
+          </tr>
+          <tr>
+            <th scope="row">Geography</th>
+            <td>county · tract · block group</td>
+            <td>county · tract</td>
+            <td>county · tract · block group</td>
+          </tr>
+          <tr>
+            <th scope="row">Scope</th>
+            <td>national · state · county</td>
+            <td>national · state · county</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <th scope="row">Method</th>
+            <td>1-component PCA</td>
+            <td>Promax-rotated PCA, Kaiser criterion</td>
+            <td>(Advantaged − Deprived) / Total</td>
+          </tr>
+          <tr>
+            <th scope="row">Output</th>
+            <td>NDI score + quartile</td>
+            <td>NDI score</td>
+            <td>5 scores, −1 to +1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <!-- ===================== MESSER ===================== -->
+  <section class="method" id="messer">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">Messer et al. 2006</p>
+        <h2>Messer NDI</h2>
+        <span class="call">computeNDI(type = "messer")</span>
+      </div>
+      <div class="banner">
+        <p class="lead">Scope: <span>national | state | county</span></p>
+        <p>Imputation, PCA and scoring run separately within each scope group.
+          <code>"county"</code> scope works only for tract or block group.
+          <code>"national"</code> scope pulls all 50 states + DC.</p>
+      </div>
+    </div>
+
+    <div class="flow has-scope">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Fetch ACS Data</h3>
+        <span class="fn">fetchMesserAcs()</span>
+        <p class="desc">ACS-5 detailed tables: B01003 · C24030 · B25014 · B17017 · B25115 · B19058 · B19001 · B06009 · B23025. Names split by <b>cleanAcsNames()</b></p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Compute 8 Variables</h3>
+        <span class="fn">calculateMesserVars()</span>
+        <p class="desc">OCC · CWD · POV · FHH · PUB · U30 · EDU · EMP, kept as <b>proportions (0–1)</b>. x/0 → 0, 0/0 → NA</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="scope-run">
+        <div class="optional-wrap">
+          <span class="optional-pill">Optional</span>
+          <div class="step">
+            <span class="num">3</span>
+            <h3>Impute</h3>
+            <span class="fn">imputeMissing()</span>
+            <p class="desc">Spatial mean over <b>Queen-contiguity</b> neighbors, weighted by <b>tot_pop</b> (default) or unweighted</p>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">4</span>
+          <h3>PCA</h3>
+          <span class="fn">psych::principal()</span>
+          <p class="desc"><b>1 component</b> from the correlation matrix. Uses <b>complete cases only</b>, after dropping zero-population geographies</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">5</span>
+          <h3>Score &amp; Quartile</h3>
+          <span class="fn">processMesserScope()</span>
+          <p class="desc"><b>NDI = PC1 / λ₁²</b>. Sign flipped so POV loads positive. <b>NDIQuartile</b> from quantile cut points</p>
+        </div>
+
+        <span class="scope-label">Runs once per scope group in <code>processMesserScope()</code></span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div><code>OCC</code>males in management, business, science &amp; arts jobs</div>
+      <div><code>CWD</code>crowded housing (&gt; 1 occupant per room)</div>
+      <div><code>POV</code>households below poverty</div>
+      <div><code>FHH</code>female-headed households with children</div>
+      <div><code>PUB</code>public assistance or food stamps</div>
+      <div><code>U30</code>household income under $30k</div>
+      <div><code>EDU</code>adults 25+ without a high-school diploma</div>
+      <div><code>EMP</code>unemployed, civilian labor force</div>
+    </div>
+    <ul class="notes">
+      <li>The PCA uses complete cases (listwise deletion). <code>ndi</code> uses pairwise-complete correlations, so loadings can differ slightly where missingness is high.</li>
+      <li>The component sign is aligned to <code>POV</code>, so a higher NDI always means more deprivation in every scope group.</li>
+    </ul>
+    <p class="src">Messer LC et&nbsp;al. 2006, J Urban Health 83(6):1041–1062 · ported from ndi::messer</p>
+  </section>
+
+  <!-- ===================== POWELL-WILEY ===================== -->
+  <section class="method" id="powell-wiley">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">Andrews et al. 2020</p>
+        <h2>Powell-Wiley NDI</h2>
+        <span class="call">computeNDI(type = "powell_wiley")</span>
+      </div>
+      <div class="banner">
+        <p class="lead">Scope: <span>national | state | county</span> · Geography: <span>county | tract</span></p>
+        <p>Standardization, PCA and scoring run separately within each scope group.
+          Block group isn't available because the ACS data-profile (<code>DP04</code>) and subject (<code>S1501</code>, <code>S1702</code>, <code>S2301</code>) tables stop at tract level.</p>
+      </div>
+    </div>
+
+    <div class="flow has-scope">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Fetch ACS Data</h3>
+        <span class="fn">fetchPowellWileyAcs()</span>
+        <p class="desc">Detailed tables (B01001 · B19013 · B19054 · B19058 · B25077 · C24060 · B11005) plus <b>DP04</b> and <b>S1501 · S1702 · S2301</b>, fetched in a single request</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Compute 13 Variables</h3>
+        <span class="fn">calculatePowellWileyVars()</span>
+        <p class="desc">Log of median income &amp; home value. Advantage percentages flipped to <b>100 − %</b> so every variable points toward deprivation. Non-finite → NA</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="scope-run w4">
+        <div class="optional-wrap">
+          <span class="optional-pill">Optional</span>
+          <div class="step">
+            <span class="num">3</span>
+            <h3>Impute</h3>
+            <span class="fn">imputeMissing()</span>
+            <p class="desc">Spatial mean over <b>Queen-contiguity</b> neighbors, weighted by <b>tot_pop</b> (default) or unweighted</p>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">4</span>
+          <h3>Standardize</h3>
+          <span class="fn">scale()</span>
+          <p class="desc">Complete cases only. The <b>11 percentages are z-scored</b> within the scope. The 2 log variables are used as-is</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">5</span>
+          <h3>Promax PCA</h3>
+          <span class="fn">psych::principal() + promax()</span>
+          <p class="desc">Number of components by <b>Kaiser criterion</b> (eigenvalue &gt; 1), then <b>promax rotation</b> (m = 3)</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">6</span>
+          <h3>Score</h3>
+          <span class="fn">processPowellWileyScope()</span>
+          <p class="desc"><b>Regression score</b> on component 1 using variables with |structure loading| &gt; 0.4. Sign flipped so PctFamBelowPov loads positive</p>
+        </div>
+
+        <span class="scope-label">Runs once per scope group in <code>processPowellWileyScope()</code></span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div><code>logMedHHInc</code>log median household income</div>
+      <div><code>logMedHomeVal</code>log median home value</div>
+      <div><code>PctNoIDR</code>no interest, dividend or rental income</div>
+      <div><code>PctPubAsst</code>public assistance income</div>
+      <div><code>PctWorkClass</code>not in management / professional jobs</div>
+      <div><code>PctFemHeadKids</code>female-headed households with children</div>
+      <div><code>PctNotOwnerOcc</code>not owner-occupied</div>
+      <div><code>PctNoPhone</code>no telephone service</div>
+      <div><code>PctNComPlmb</code>incomplete plumbing</div>
+      <div><code>PctEducLTHS</code>less than high school (25+)</div>
+      <div><code>PctEducLTBch</code>less than bachelor's (25+)</div>
+      <div><code>PctFamBelowPov</code>families below poverty</div>
+      <div><code>PctUnempl</code>unemployment rate</div>
+    </div>
+    <ul class="notes">
+      <li>The population-weighted quintile grouping is not computed. Only the NDI score is returned.</li>
+      <li>The component sign is aligned to <code>PctFamBelowPov</code>, and the PCA uses complete cases rather than pairwise-complete correlations.</li>
+    </ul>
+    <p class="src">Andrews MR et&nbsp;al. 2020, J Maps 16(1):101–112 · ported from ndi::powell_wiley</p>
+  </section>
+
+  <!-- ===================== ICE ===================== -->
+  <section class="method" id="ice">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">Krieger et al. 2016</p>
+        <h2>Index of Concentration at the Extremes</h2>
+        <span class="call">computeICE()</span>
+      </div>
+      <div class="banner">
+        <p class="lead">No scope · no ranking · no PCA</p>
+        <p>Each measure is a ratio computed separately for each geography,
+          <span class="formula">(Advantaged − Deprived) / Total</span>,
+          ranging from −1 (deprived) to +1 (privileged). No geographies are ranked or pooled, so there is no <code>scope</code> argument.</p>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Fetch ACS Data</h3>
+        <span class="fn">fetchICEAcs()</span>
+        <p class="desc">ACS-5 detailed tables: B19001 · B19001H · B19001B · B15002 · B03002, down to <b>block group</b>. Names split by <b>cleanAcsNames()</b></p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Compute 5 ICE Measures</h3>
+        <span class="fn">calculateICEVars()</span>
+        <p class="desc">Income · education · race/ethnicity · racialized economic · White income. <b>Income cutpoints change in 2016</b>. Non-finite → NA</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="optional-wrap">
+        <span class="optional-pill">Optional</span>
+        <div class="step">
+          <span class="num">3</span>
+          <h3>Impute</h3>
+          <span class="fn">imputeMissingICE()</span>
+          <p class="desc">Spatial mean over <b>Queen-contiguity</b> neighbors. Each measure is imputed <b>on its own</b> (unweighted)</p>
+        </div>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">4</span>
+        <h3>Assemble Output</h3>
+        <span class="fn">computeICE()</span>
+        <p class="desc">Returns <b>df_ice</b>, the component sums, geometry and a <b>missingness</b> summary per measure</p>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div><code>ICE_inc</code>high-income − low-income households</div>
+      <div><code>ICE_edu</code>bachelor's+ − less than high school (25+)</div>
+      <div><code>ICE_rewb</code>non-Hispanic White − non-Hispanic Black</div>
+      <div><code>ICE_wbinc</code>high-income White − low-income Black households</div>
+      <div><code>ICE_wpcinc</code>high-income − low-income White households</div>
+    </div>
+    <ul class="notes">
+      <li>Block group is supported because every input comes from a detailed B-table. <code>ndi::krieger</code> stops at tract.</li>
+      <li>Cutpoints: before 2016, low income is &lt; $25k and high is &gt; $100k. From 2016 on, low is &lt; $30k and high is &gt; $125k.</li>
+    </ul>
+    <p class="src">Krieger N et&nbsp;al. 2016, Am J Public Health 106(2):256–263 · ported from ndi::krieger</p>
+  </section>
+
+  <footer class="page-foot">
+    Every index returns an <code>annotation</code> per geography: Complete data · Imputation completed · Imputation incomplete · PCA failed · No population. The ICE annotation uses only the first three.
+    With <code>impute = TRUE</code>, the result also includes a baseline without imputation (<code>df_ndi_raw</code> / <code>df_ice_raw</code>) for side-by-side comparison.
+  </footer>
+
+</div>
+</body>
+</html>

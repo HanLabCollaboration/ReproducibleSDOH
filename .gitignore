@@ -1,0 +1,63 @@
+# R / RStudio
+.Rproj.user
+.Rhistory
+.Rdata
+.RData
+.httr-oauth
+.vscode
+
+# Secrets (Census API key, GitHub tokens) — never commit
+.Renviron
+.env
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Package build artifacts
+inst/doc
+docs/
+*.tar.gz
+*.Rcheck/
+
+# Rendered plan documents (plan*.md is the source of truth)
+plan/*.html
+plan/libs/
+plan/*_files/
+plan_files/
+
+# ---------------------------------------------------------------------------
+# Pipeline outputs — the scripts in pipeline/ are committed, their outputs are not.
+# Runs normally write to $SCRATCH/sdoh/<run_id>/ (outside the repo); these
+# patterns catch any local or test run that writes inside the checkout.
+# ---------------------------------------------------------------------------
+pipeline/runs/
+pipeline/grids/
+pipeline/out/
+pipeline/done/
+pipeline/qa/
+pipeline/logs/
+pipeline/census_cache/
+pipeline/provenance.json
+*.parquet
+*.gpkg
+*.rds
+*.csv.gz
+*.out
+*.err
+slurm-*.out
+
+# Keep the small test fixtures (they must be committed)
+!tests/testthat/fixtures/
+!tests/testthat/fixtures/**
+
+# renv: commit renv.lock, not the library
+renv/library/
+renv/local/
+renv/staging/
+
+# Claude project instructions (family convention)
+CLAUDE.md
