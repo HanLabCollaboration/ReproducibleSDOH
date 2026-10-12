@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReproducibleSDOH Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,500;1,500&display=swap">
+
+<style>
+  :root {
+    /* palette — shared with the other ReproducibleX pipeline figures */
+    --ground:        #ffffff;
+    --panel:         #f4f7f8;
+    --ink:           #14202b;
+    --ink-soft:      #4a5b68;
+    --box:           #1f3a5c;
+    --box-edge:      #16293f;
+    --box-ink:       #ffffff;
+    --box-sub:       #c6d4e2;
+    --box-fn:        #8fb9e0;
+    --teal:          #2b7f92;
+    --teal-deep:     #1d6675;
+    --banner-bg:     #eaf5f3;
+    --banner-edge:   #6fb3ae;
+    --chip:          #9aa7b4;
+    --chip-ink:      #ffffff;
+    --arrow:         #3d72b0;
+    --optional:      #e07f2c;
+    --hair:          #d9e1e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #0e1620;
+      --panel:         #16212d;
+      --ink:           #eef3f6;
+      --ink-soft:      #9fb0bd;
+      --box:           #22456b;
+      --box-edge:      #35618d;
+      --box-ink:       #ffffff;
+      --box-sub:       #c1d3e4;
+      --box-fn:        #9cc6ec;
+      --teal:          #4fb3c6;
+      --teal-deep:     #6ecad9;
+      --banner-bg:     #12303a;
+      --banner-edge:   #2f7d8c;
+      --chip:          #62748a;
+      --chip-ink:      #ffffff;
+      --arrow:         #6a9fd6;
+      --optional:      #f0954a;
+      --hair:          #263543;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:        #0e1620;
+    --panel:         #16212d;
+    --ink:           #eef3f6;
+    --ink-soft:      #9fb0bd;
+    --box:           #22456b;
+    --box-edge:      #35618d;
+    --box-ink:       #ffffff;
+    --box-sub:       #c1d3e4;
+    --box-fn:        #9cc6ec;
+    --teal:          #4fb3c6;
+    --teal-deep:     #6ecad9;
+    --banner-bg:     #12303a;
+    --banner-edge:   #2f7d8c;
+    --chip:          #62748a;
+    --chip-ink:      #ffffff;
+    --arrow:         #6a9fd6;
+    --optional:      #f0954a;
+    --hair:          #263543;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 52px);
+  }
+
+  .sheet { max-width: 1360px; margin: 0 auto; }
+
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* ---------- page header ---------- */
+  .page-head { margin-bottom: clamp(24px, 4vw, 40px); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-family: "Barlow Semi Condensed", "Inter", sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.6vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--teal);
+    margin: 0 0 12px;
+  }
+  h1 .light { color: var(--ink); font-weight: 600; }
+  .intro {
+    max-width: 68ch;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .intro code { color: var(--ink); font-size: 13.5px; }
+
+  /* ---------- comparison table ---------- */
+  .compare-wrap {
+    overflow-x: auto;
+    margin: 28px 0 0;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  table.compare {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  .compare th, .compare td {
+    text-align: left;
+    vertical-align: top;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .compare tr:last-child th, .compare tr:last-child td { border-bottom: 0; }
+  .compare thead th {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--teal-deep);
+  }
+  .compare thead th a { color: inherit; text-decoration: none; border-bottom: 1.5px solid transparent; }
+  .compare thead th a:hover, .compare thead th a:focus-visible { border-bottom-color: currentColor; outline: none; }
+  .compare tbody th {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    width: 130px;
+    white-space: nowrap;
+  }
+  .compare td { color: var(--ink); }
+  .compare td code { font-size: 12.5px; color: var(--teal-deep); }
+  .compare .num-cell { font-variant-numeric: tabular-nums; }
+
+  /* ---------- method sections ---------- */
+  .method {
+    margin-top: clamp(44px, 6vw, 72px);
+    padding-top: clamp(28px, 4vw, 40px);
+    border-top: 1px solid var(--hair);
+    scroll-margin-top: 16px;
+  }
+  .method-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px 32px;
+    margin-bottom: 8px;
+  }
+  .method-title { min-width: 240px; }
+  .method-title h2 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 3.6vw, 36px);
+    line-height: 1.05;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .method-title .call {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .banner {
+    flex: 1 1 440px;
+    max-width: 660px;
+    background: var(--banner-bg);
+    border: 1.5px solid var(--banner-edge);
+    border-radius: 10px;
+    padding: 14px 20px;
+  }
+  .banner .lead {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--teal-deep);
+    font-size: 15px;
+    margin: 0 0 5px;
+  }
+  .banner .lead span { color: var(--ink-soft); font-weight: 500; }
+  .banner p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
+  .banner code { color: var(--ink); font-size: 12.5px; }
+  .formula {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ---------- flow ---------- */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    padding: 34px 12px 12px;
+  }
+
+  .step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 168px;
+    background: var(--box);
+    border: 1px solid var(--box-edge);
+    border-radius: 10px;
+    padding: 26px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    box-shadow: 0 10px 24px -16px rgba(10, 25, 45, 0.55);
+  }
+  .num {
+    position: absolute;
+    top: -15px;
+    left: -11px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--chip);
+    color: var(--chip-ink);
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 3px 8px -2px rgba(0, 0, 0, 0.35);
+  }
+  .step h3 {
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.05;
+    color: var(--box-ink);
+    margin: 2px 0 0;
+    text-wrap: balance;
+  }
+  .fn {
+    font-family: "JetBrains Mono", monospace;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--box-fn);
+    overflow-wrap: anywhere;
+  }
+  .desc {
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--box-sub);
+    margin: auto 0 0;
+  }
+  .desc b { color: var(--box-ink); font-weight: 600; }
+
+  .arrow {
+    flex: 0 0 32px;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    color: var(--arrow);
+  }
+  .arrow svg { width: 24px; height: 20px; display: block; }
+
+  /* optional (dashed orange) group */
+  .optional-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 188px;
+    border: 2px dashed var(--optional);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    align-items: stretch;
+  }
+  .optional-wrap .step { box-shadow: none; }
+  .optional-pill {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    background: var(--optional);
+    color: #ffffff;
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* per-scope-group bracket (Messer / Powell-Wiley) */
+  .scope-run {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex: 3 1 0;
+    padding-bottom: 46px;
+  }
+  .scope-run.w4 { flex-grow: 4; }
+  .scope-run::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 22px;
+    height: 12px;
+    border: 2px solid var(--teal);
+    border-top: 0;
+    border-radius: 0 0 7px 7px;
+  }
+  .scope-label {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12.5px;
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+  .scope-label code { font-weight: 500; font-size: 12px; }
+  /* keep arrows outside the bracket vertically aligned with boxes */
+  .flow > .arrow { margin-bottom: 0; }
+  .flow.has-scope > .arrow { margin-bottom: 46px; }
+  .flow.has-scope > .step { margin-bottom: 46px; }
+
+  /* ---------- variable legend ---------- */
+  .legend {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 8px 26px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--hair);
+  }
+  .legend div { font-size: 12.5px; line-height: 1.4; color: var(--ink-soft); }
+  .legend code { color: var(--teal-deep); font-size: 12px; margin-right: 6px; }
+  .notes {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 110ch;
+  }
+  .notes li::before { content: "Deviation from ndi · "; color: var(--optional); font-weight: 600; }
+  .notes code { color: var(--ink); font-size: 12px; }
+  .src {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .page-foot {
+    margin-top: clamp(40px, 6vw, 64px);
+    padding-top: 16px;
+    border-top: 1px solid var(--hair);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .page-foot code { color: var(--ink); font-size: 12px; }
+
+  /* ---------- narrow screens: stack vertically ---------- */
+  @media (max-width: 760px) {
+    .flow, .scope-run { flex-direction: column; }
+    .flow { padding: 24px 12px 8px; }
+    .step, .optional-wrap { min-width: 0; }
+    .arrow { flex-basis: 30px; transform: rotate(90deg); }
+    .flow.has-scope > .arrow, .flow.has-scope > .step { margin-bottom: 0; }
+    .scope-label { white-space: normal; width: 100%; text-align: center; }
+  }
+</style>
+<style>
+  .notes li::before { content: attr(data-tag) " · "; }
+  .compare td:first-child code { font-weight: 600; }
+  .scope-run.w2 { flex-grow: 2; }
+  .scope-run.w6 { flex-grow: 6; }
+  .status {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 3px 12px;
+    border: 1.5px dashed var(--optional);
+    border-radius: 20px;
+    font-family: "Barlow Semi Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--optional);
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="page-head">
+    <p class="eyebrow">tidySDOH · package pipelines</p>
+    <h1>Reproducible<span class="light">SDOH</span></h1>
+    <p class="intro">
+      The umbrella package for the ReproducibleX family. A SLURM pipeline on Stanford Sherlock pre-computes every index × geography × scope × year and publishes them as Parquet releases of <code>ReproducibleSDOH-data</code>.
+      Users then call <code>getYost()</code>, <code>getNDI()</code>, <code>getICE()</code>, <code>getSDI()</code> or <code>getCDI()</code> to get an index in seconds, with no Census API key.
+    </p>
+    <span class="status">Planned · see plan/plan.md</span>
+
+    <div class="compare-wrap">
+      <table class="compare">
+        <thead>
+          <tr>
+            <th scope="col">Release</th>
+            <th scope="col">One file per</th>
+            <th scope="col">Columns</th>
+            <th scope="col">Built from</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>geoinfo-v…</code></td>
+            <td><code>geoinfo_{geo}_{year}</code></td>
+            <td>GEOID · NAME · tot_pop</td>
+            <td>ACS <code>B01003_001</code>, shared by every index</td>
+          </tr>
+          <tr>
+            <td><code>geometry-v…</code></td>
+            <td><code>geometry_{geo}_{year}</code></td>
+            <td>GEOID · geometry (WKB)</td>
+            <td>the same download as geoinfo</td>
+          </tr>
+          <tr>
+            <td><code>yost-v…</code></td>
+            <td><code>yost_{geo}_{scope}_{year}</code></td>
+            <td>GEOID · Yost · YostStabilizedImputed</td>
+            <td>ReproducibleYostIndex</td>
+          </tr>
+          <tr>
+            <td><code>ndi-v…</code></td>
+            <td><code>ndi_{type}_{geo}_{scope}_{year}</code></td>
+            <td>GEOID · NDI · NDIImputed</td>
+            <td>ReproducibleNDI (Messer, Powell-Wiley)</td>
+          </tr>
+          <tr>
+            <td><code>ice-v…</code></td>
+            <td><code>ice_{geo}_{year}</code></td>
+            <td>GEOID · 5 ICE measures, raw + Imputed</td>
+            <td>ReproducibleNDI</td>
+          </tr>
+          <tr>
+            <td><code>sdi-v…</code></td>
+            <td><code>sdi_{geo}_{scope}_{year}</code></td>
+            <td>GEOID · SDI · SDIImputed</td>
+            <td>ReproducibleSDI</td>
+          </tr>
+          <tr>
+            <td><code>cdi-v…</code></td>
+            <td><code>cdi_{geo}_{scope}_{year}</code></td>
+            <td>GEOID · CDI_std · CDI_stdImputed</td>
+            <td>ReproducibleCDI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </header>
+
+  <!-- ===================== BUILD (Sherlock) ===================== -->
+  <section class="method" id="build">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">For maintainers · runs on Sherlock</p>
+        <h2>Build a Release</h2>
+        <span class="call">pipeline/</span>
+      </div>
+      <div class="banner">
+        <p class="lead">~430 tasks · <span>index × geo × scope × year</span></p>
+        <p>Each task is one SLURM array job that writes one Parquet file. Census downloads are cached on disk for the run, so tasks with the same request share one download. Every file records the package and pipeline git commits that produced it.</p>
+      </div>
+    </div>
+
+    <div class="flow has-scope">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Configure</h3>
+        <span class="fn">config.R · registry.R</span>
+        <p class="desc">Run ID, years and <b>pinned package versions</b>. One registry entry per index says what to call and what to write</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Make Task Grid</h3>
+        <span class="fn">make_grid.R</span>
+        <p class="desc">One row per task, split into <b>memory tiers</b> (16 / 48 / 128 GB). National tasks run before state tasks so they share downloads</p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="scope-run w2">
+        <div class="step">
+          <span class="num">3</span>
+          <h3>Geography</h3>
+          <span class="fn">build_geometry.R</span>
+          <p class="desc">One download per geo × year writes <b>geoinfo</b> (GEOID, NAME, tot_pop) and <b>geometry</b>. Runs first</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">4</span>
+          <h3>Compute Indices</h3>
+          <span class="fn">run_task.R</span>
+          <p class="desc">Calls the sibling <b>compute*()</b> for raw and best. Writes <b>GEOID + scores</b> only, after checking groups, population and NAs in memory</p>
+        </div>
+
+        <span class="scope-label">SLURM array jobs, submitted with <code>submit.sh</code></span>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">5</span>
+        <h3>Quality Check</h3>
+        <span class="fn">qa_release.R</span>
+        <p class="desc">Every file present, GEOIDs match <b>geoinfo</b>, value ranges, check summaries, and differences from the <b>previous release</b></p>
+      </div>
+
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div class="step">
+        <span class="num">6</span>
+        <h3>Publish</h3>
+        <span class="fn">publish.R</span>
+        <p class="desc">sha256 checksums and a <b>GitHub release per index</b>, then <b>manifest.json</b> updated. Copied to Box with <b>archive.sh</b></p>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li data-tag="Order">geoinfo and geometry are published first. Every index release names the geoinfo and geometry releases it matches.</li>
+      <li data-tag="Tracking">Re-running a task that already finished does nothing. <code>check_status.R</code> lists failed or missing tasks and prints the command to re-submit them.</li>
+      <li data-tag="Census cache">The pipeline swaps in a caching <code>tidycensus::get_acs()</code> during the run only. None of the sibling packages are changed.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== USE (get*) ===================== -->
+  <section class="method" id="use">
+    <div class="method-head">
+      <div class="method-title">
+        <p class="eyebrow">For users · R package</p>
+        <h2>Get an Index</h2>
+        <span class="call">getYost() · getNDI() · getICE() · getSDI() · getCDI()</span>
+      </div>
+      <div class="banner">
+        <p class="lead">No Census API key · <span>cached locally</span></p>
+        <p>Files are verified by checksum and downloaded once. By default <code>release = "latest"</code>; pin a tag such as <code>release = "ndi-v2026.10"</code> so a paper's numbers never change.</p>
+      </div>
+    </div>
+
+    <div class="flow has-scope">
+      <div class="scope-run w6">
+        <div class="step">
+          <span class="num">1</span>
+          <h3>Resolve Release</h3>
+          <span class="fn">sdoh_manifest()</span>
+          <p class="desc">Reads <b>manifest.json</b> to turn "latest" into a real tag, along with the matching geoinfo and geometry releases</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">2</span>
+          <h3>Download &amp; Cache</h3>
+          <span class="fn">download.R</span>
+          <p class="desc">Downloads the one Parquet file needed, checks its <b>sha256</b>, and saves it to the local cache</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">3</span>
+          <h3>Read + Join Geoinfo</h3>
+          <span class="fn">info = TRUE</span>
+          <p class="desc">Reads GEOID + scores, adds year, geo and scope, and joins <b>NAME</b> and <b>tot_pop</b> from geoinfo</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="optional-wrap">
+          <span class="optional-pill">Optional</span>
+          <div class="step">
+            <span class="num">4</span>
+            <h3>Add Groups</h3>
+            <span class="fn">groups = 5</span>
+            <p class="desc">Quintiles, quartiles or percentiles, computed <b>before</b> filtering states so national groups stay national</p>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="step">
+          <span class="num">5</span>
+          <h3>Filter States</h3>
+          <span class="fn">states = c(...)</span>
+          <p class="desc">Keeps rows whose <b>GEOID</b> starts with a requested state FIPS code</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M1 10h19M15 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="optional-wrap">
+          <span class="optional-pill">Optional</span>
+          <div class="step">
+            <span class="num">6</span>
+            <h3>Attach Geometry</h3>
+            <span class="fn">geometry = TRUE</span>
+            <p class="desc">Joins boundaries from the geometry release and returns an <b>sf</b> object</p>
+          </div>
+        </div>
+
+        <span class="scope-label">Inside every <code>get*()</code> call, in the shared engine <code>sdoh_get()</code></span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div><code>getYost()</code>Yost Index (raw, stabilized + imputed)</div>
+      <div><code>getNDI()</code>Messer or Powell-Wiley NDI</div>
+      <div><code>getICE()</code>5 ICE measures (no scope)</div>
+      <div><code>getSDI()</code>Social Deprivation Index</div>
+      <div><code>getCDI()</code>Community Deprivation Index</div>
+      <div><code>getGeoInfo()</code>GEOID, NAME, tot_pop alone</div>
+      <div><code>addQuintiles()</code>also addQuartiles(), addPercentiles(), addGroups()</div>
+      <div><code>addIndexGroups()</code>each index's original grouping</div>
+      <div><code>sdoh_export_csv()</code>Parquet → CSV, GEOID kept as text</div>
+      <div><code>sdoh_open()</code>arrow query across cached files</div>
+      <div><code>sdoh_releases()</code>list published releases</div>
+      <div><code>computeSDOH()</code>compute locally with the sibling package</div>
+    </div>
+    <ul class="notes">
+      <li data-tag="Compute path">Options that aren't pre-computed, such as <code>scope = "county"</code>, go through <code>computeSDOH()</code>. It calls <code>computeYostIndex()</code>, <code>computeNDI()</code>, <code>computeICE()</code>, <code>computeSDI()</code> or <code>computeCDI()</code> from the sibling package, which is installed only when needed.</li>
+      <li data-tag="Groups">Files store scores only. Groups are always computed from the scores, so they can never disagree with them.</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    Code and pipeline: <code>HanLabCollaboration/ReproducibleSDOH</code> · Data: <code>HanLabCollaboration/ReproducibleSDOH-data</code>.
+    This diagram shows the plan as of 2026-09-29 (<code>plan/plan.md</code>, <code>plan/plan_NDI.md</code>).
+  </footer>
+
+</div>
+</body>
+</html>
