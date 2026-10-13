@@ -120,7 +120,7 @@ Things to know:
 
 | Index | Folder | Status |
 |---|---|---|
-| Yost | `pipeline/yost/` | Pilot passed; full run of 52 tasks submitted on 2026-10-12 |
+| Yost | `pipeline/yost/` | Full run complete on 2026-10-12: 52 of 52 tasks, all checks passed. Not yet published |
 | NDI (Messer, Powell-Wiley), ICE | not created yet | Next |
 | SDI | not created yet | |
 | CDI | not created yet | |
@@ -130,7 +130,7 @@ Notes from the Yost run:
 - **Coverage:** tract (2011–2024) and block group (2013–2024), national and state scope.
 - **Versions published:** `Yost` (raw) and `YostStabilizedImputed` (stabilized and imputed), from one `computeYostIndex()` call per task.
 - **Parquet writer:** `nanoparquet`. `arrow` does not load on Sherlock, because its prebuilt library needs a newer system C library.
-- **Pilot measurements (2022):** tract peaked at 2.7 GB and took 18–28 minutes; block group, national, peaked at 5.9 GB and took 81 minutes.
+- **Measured in the full run:** tract tasks peaked at 2.4–2.9 GB, except 2011 and 2012 at 14.3 GB (those years download full-detail boundaries), and took 16–33 minutes. Block-group tasks peaked at 2.4–5.5 GB and took 35–81 minutes.
 - **Not built yet:** a status script, the QA report, publishing to `ReproducibleSDOH-data`, and archiving the run off scratch. The grouping and population checks described in the plan are recorded as "not run".
 
 ## Plans
