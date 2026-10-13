@@ -1,0 +1,12 @@
+^ReproducibleSDOH\.Rproj$
+^\.Rproj\.user$
+^\.vscode$
+^CLAUDE\.md$
+^LICENSE\.md$
+^README\.Rmd$
+^pipeline$
+^plan$
+^plan_files$
+^index_reference_csv$
+^Reproducible.*\.html$
+^local-only$

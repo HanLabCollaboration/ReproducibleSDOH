@@ -1,6 +1,6 @@
 # ReproducibleSDOH
 
-> **Status: under construction.** The R package does not exist yet. The Sherlock pipeline in `pipeline/` works and is being run one index at a time (see [Status](#status)).
+> **Status: under construction.** The `get*()` functions work against the published data releases. Names, population and boundaries (`info`, `geometry`) need the `geoinfo` and `geometry` releases, which are not published yet. The Sherlock pipeline in `pipeline/` is run one index at a time (see [Status](#status)).
 
 ReproducibleSDOH will be the umbrella R package for the **ReproducibleX** family of neighborhood socioeconomic indices built from the US Census Bureau's American Community Survey:
 
@@ -11,10 +11,35 @@ ReproducibleSDOH will be the umbrella R package for the **ReproducibleX** family
 | [ReproducibleSDI](https://github.com/HanLabCollaboration/ReproducibleSDI) | Social Deprivation Index |
 | [ReproducibleCDI](https://github.com/HanLabCollaboration/ReproducibleCDI) | Community Deprivation Index |
 
-It will offer two ways to get an index:
+## Using the package
 
-- **`get*()` functions** (`getYost()`, `getNDI()`, `getICE()`, `getSDI()`, `getCDI()`) that download **pre-computed** indices, without a Census API key. The files are Parquet, published as releases of `ReproducibleSDOH-data`.
-- **`computeSDOH()`**, which hands off to the sibling packages to compute an index locally with any options.
+```r
+# install.packages("remotes")
+remotes::install_github("HanLabCollaboration/ReproducibleSDOH")
+library(ReproducibleSDOH)
+
+# Yost Index for every US census tract, 2018-2022 ACS
+yost <- getYostIndex(geo = "tract", year = 2022, info = FALSE)
+
+# Messer NDI for block groups in California and New York, computed within each state
+ndi <- getNDI(type = "messer", geo = "block group", year = 2022, scope = "state",
+              states = c("CA", "NY"), info = FALSE)
+
+# The five ICE measures, raw version only, for several years
+ice <- getICE(geo = "tract", year = 2019:2022, version = "raw", info = FALSE)
+```
+
+| Function | Returns |
+|---|---|
+| `getYostIndex()` | Yost Index: `Yost` (raw) and `YostStabilizedImputed` (best) |
+| `getNDI()` | Neighborhood Deprivation Index, Messer or Powell-Wiley: `NDI` and `NDIImputed` |
+| `getICE()` | Five Index of Concentration at the Extremes measures, raw and imputed |
+| `getGeoInfo()` | Area names, total population and, optionally, boundaries |
+
+- **No Census API key is needed.** The functions download pre-computed Parquet files from the releases of [ReproducibleSDOH-data](https://github.com/HanLabCollaboration/ReproducibleSDOH-data), verify them against the release's checksums, and cache them (`sdoh_cache_dir()`).
+- **Coverage:** census tracts (2011–2024) and block groups (2013–2024), 50 states and DC, at national and state scope.
+- **`info = TRUE`** (the default) adds each area's name and population, and **`geometry = TRUE`** returns an `sf` object with boundaries. Both need the `geoinfo` and `geometry` releases; until those are published, pass `info = FALSE`.
+- **To compute an index yourself**, with other options or geographies, use the sibling packages listed above.
 
 This repository also holds the **Stanford Sherlock (SLURM) pipeline** that pre-computes every index × geography × scope × year. It lives in `pipeline/` and is not part of the installed package.
 

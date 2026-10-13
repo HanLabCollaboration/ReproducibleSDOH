@@ -1,0 +1,35 @@
+Package: ReproducibleSDOH
+Title: Pre-Computed Neighborhood Socioeconomic Indices for the United States
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Rafael", "Catoia Pulgrossi", email = "rcatoiap@stanford.edu", role = c("aut", "cre")),
+    person("Tae Yoon", "Lee", email = "harrytyl@stanford.edu", role = c("aut")))
+Description: Downloads pre-computed neighborhood socioeconomic indices built
+    from the US Census Bureau's American Community Survey (ACS): the Yost
+    Index, the Neighborhood Deprivation Index (Messer and Powell-Wiley) and the
+    Index of Concentration at the Extremes (ICE), for census tracts and block
+    groups. No Census API key is needed. The files are published as releases of
+    the 'ReproducibleSDOH-data' repository and are cached locally after the
+    first download.
+License: MIT + file LICENSE
+Encoding: UTF-8
+URL: https://github.com/HanLabCollaboration/ReproducibleSDOH
+BugReports: https://github.com/HanLabCollaboration/ReproducibleSDOH/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    digest,
+    glue,
+    nanoparquet,
+    rlang,
+    stats,
+    tibble,
+    tools,
+    utils
+Suggests:
+    sf,
+    testthat (>= 3.0.0),
+    withr
+Depends:
+    R (>= 4.1.0)
+Config/testthat/edition: 3
