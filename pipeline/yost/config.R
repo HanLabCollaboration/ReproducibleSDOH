@@ -79,8 +79,8 @@ CENSUS_CACHE_DIR <- file.path(OUT_ROOT, "census_cache")
 # that every task records in its done JSON.
 TIER_BY_GEO <- c("tract" = "medium", "block group" = "high")
 TIERS <- list(
-  medium = list(mem = "48G",  time = "12:00:00", max_parallel = 10L),
-  high   = list(mem = "128G", time = "24:00:00", max_parallel = 5L)
+  medium = list(mem = "20G",  time = "12:00:00", max_parallel = 8L),
+  high   = list(mem = "48G", time = "24:00:00", max_parallel = 8L)
 )
 SLURM_CPUS      <- 2L
-SLURM_PARTITION <- Sys.getenv("SDOH_PARTITION", unset = "normal,qsu,owners")
+SLURM_PARTITION <- Sys.getenv("SDOH_PARTITION", unset = "qsu,normal,qsu,owners")

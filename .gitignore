@@ -29,6 +29,9 @@ plan/libs/
 plan/*_files/
 plan_files/
 
+# Local files for mounting sherlock
+local-only/
+
 # ---------------------------------------------------------------------------
 # Pipeline outputs — the scripts in pipeline/ are committed, their outputs are not.
 # Runs normally write to $SCRATCH/sdoh/<run_id>/ (outside the repo); these
