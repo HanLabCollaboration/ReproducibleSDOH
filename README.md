@@ -121,7 +121,7 @@ Things to know:
 | Index | Folder | Status |
 |---|---|---|
 | Yost | `pipeline/yost/` | Full run complete on 2026-10-12: 52 of 52 tasks, all checks passed. Not yet published |
-| NDI (Messer, Powell-Wiley), ICE | not created yet | Next |
+| NDI (Messer, Powell-Wiley), ICE | `pipeline/ndi/` | Full run complete on 2026-10-13: 106 of 106 tasks, all checks passed. Not yet published |
 | SDI | not created yet | |
 | CDI | not created yet | |
 

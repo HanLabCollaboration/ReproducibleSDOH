@@ -141,13 +141,14 @@ if (length(missing) > 0) install.packages(missing, lib = lib)
 # environment makes GitHub answer "401 Bad credentials", so ignore any token here.
 Sys.unsetenv(c("GITHUB_PAT", "GITHUB_TOKEN"))
 configs <- Sys.glob(file.path(Sys.getenv("SDOH_PIPELINE_DIR"), "*", "config.R"))
-refs <- unique(vapply(configs, function(f) {
+# A folder without a PACKAGE_REF (geography) needs no sibling package.
+refs <- unique(unlist(lapply(configs, function(f) {
   e <- new.env()
   assign("INDEX_DIR", dirname(f), envir = e)
   sys.source(f, envir = e)
   e$PACKAGE_REF
-}, character(1)))
-if (length(refs) == 0) stop("No pipeline/<index>/config.R found.", call. = FALSE)
+})))
+if (length(refs) == 0) stop("No PACKAGE_REF found in pipeline/<index>/config.R.", call. = FALSE)
 message("Sibling packages: ", paste(refs, collapse = ", "))
 for (ref in refs) {
   remotes::install_github(ref, lib = lib, upgrade = "never", dependencies = TRUE)
