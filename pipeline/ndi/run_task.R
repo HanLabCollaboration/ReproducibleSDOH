@@ -166,13 +166,20 @@ main <- function() {
     vals <- unlist(scores[, -1], use.names = FALSE)
     checks$out_of_range <- sum(abs(vals) > 1, na.rm = TRUE)
     # ICE annotates rows, not measures: a row has a missing imputed measure
-    # exactly when it is annotated "Imputation incomplete".
+    # exactly when it is annotated "Imputation incomplete". Rows annotated
+    # "No population" are never imputed, so they may have missing measures too.
     ann      <- best$annotation[match(scores$GEOID, best$GEOID)]
     any_miss <- rowSums(is.na(scores[, best_cols, drop = FALSE])) > 0
     checks$annotation_counts    <- as.list(table(ann, useNA = "ifany"))
-    checks$na_without_reason    <- sum(any_miss  & !(ann %in% "Imputation incomplete"))
+    checks$na_without_reason    <- sum(any_miss  & !(ann %in% c("Imputation incomplete", "No population")))
+    # No area without population may have a measure filled in by imputation.
+    no_pop <- ann %in% "No population"
+    checks$imputed_without_population <- sum(
+      !is.na(scores[no_pop, best_cols, drop = FALSE]) & is.na(scores[no_pop, raw_cols, drop = FALSE])
+    )
     checks$value_despite_reason <- sum(!any_miss &  (ann %in% "Imputation incomplete"))
-    checks$na_consistent <- checks$na_without_reason == 0 && checks$value_despite_reason == 0
+    checks$na_consistent <- checks$na_without_reason == 0 && checks$value_despite_reason == 0 &&
+      checks$imputed_without_population == 0
     checks$range_ok      <- checks$out_of_range == 0
   } else {
     # NA consistency: a score is missing exactly when the package gives a reason.

@@ -92,6 +92,8 @@ test_that("getNDI reads the method asked for", {
   expect_equal(pw$NDI[1], 21)
   expect_error(getNDI(type = "powell_wiley", geo = "block group", year = 2022, release = "v0.1"),
                "Powell-Wiley NDI is published for tract only")
+  expect_error(getNDI(type = "messer", geo = "block group", year = 2022, release = "v0.1"),
+               "Messer NDI is published for tract only")
   expect_error(getNDI(type = "singh", year = 2022, release = "v0.1"), "type")
 })
 
@@ -104,6 +106,13 @@ test_that("getICE returns the five measures without a scope column", {
   expect_named(raw, c("GEOID", "year", "geo", m))
   best <- getICE(year = 2022, version = "best", info = FALSE, release = "v0.1", quiet = TRUE)
   expect_named(best, c("GEOID", "year", "geo", paste0(m, "Imputed")))
+})
+
+test_that("getICE returns three measures for block groups", {
+  local_fake_repo()
+  m <- c("ICE_inc", "ICE_edu", "ICE_rewb")
+  out <- getICE(geo = "block group", year = 2022, info = FALSE, release = "v0.1", quiet = TRUE)
+  expect_named(out, c("GEOID", "year", "geo", m, paste0(m, "Imputed")))
 })
 
 test_that("getGeoInfo returns names and population", {

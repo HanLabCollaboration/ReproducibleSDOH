@@ -16,6 +16,8 @@ repository, without a Census API key:
 \item \code{\link[=getNDI]{getNDI()}}: the Neighborhood Deprivation Index (Messer or Powell-Wiley).
 \item \code{\link[=getICE]{getICE()}}: the Index of Concentration at the Extremes.
 \item \code{\link[=getGeoInfo]{getGeoInfo()}}: area names, total population and, optionally, boundaries.
+\item \code{\link[=addQuintiles]{addQuintiles()}} and \code{\link[=addNtiles]{addNtiles()}}: quintiles, or any number of groups of
+equal size, of the scores, computed within each year.
 }
 
 Files are cached after the first download; see \code{\link[=sdoh_cache_dir]{sdoh_cache_dir()}}.

@@ -35,6 +35,7 @@ make_fake_releases <- function(base = tempfile("sdoh-releases-")) {
   ice <- function(geo) {
     s <- score(geo, 0)
     m <- c("ICE_inc", "ICE_edu", "ICE_rewb", "ICE_wbinc", "ICE_wpcinc")
+    if (geo == "block group") m <- m[1:3]
     out <- data.frame(GEOID = s$GEOID, stringsAsFactors = FALSE)
     for (col in m) out[[col]] <- s$value / 10
     for (col in m) out[[paste0(col, "Imputed")]] <- s$value / 10 + 0.01
@@ -57,7 +58,8 @@ make_fake_releases <- function(base = tempfile("sdoh-releases-")) {
     "ndi_powellwiley_tract_national_2022.parquet" = ndi("tract", 20)
   ))
   write_fake_release(file.path(base, "ice-v0.1"), list(
-    "ice_tract_2022.parquet" = ice("tract")
+    "ice_tract_2022.parquet"       = ice("tract"),
+    "ice_block_group_2022.parquet" = ice("block group")
   ))
   write_fake_release(file.path(base, "geoinfo-v0.1"), list(
     "geoinfo_tract_2021.parquet"       = geoinfo("tract"),

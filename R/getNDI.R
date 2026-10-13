@@ -6,19 +6,17 @@
 #' [ReproducibleSDOH-data](https://github.com/HanLabCollaboration/ReproducibleSDOH-data)
 #' repository. No Census API key is needed.
 #'
-#' The Messer NDI covers census tracts (ACS 5-year 2011 onwards) and block
-#' groups (2013 onwards). The Powell-Wiley NDI covers census tracts only,
-#' because some of its ACS tables are not published for block groups. Both
-#' cover the 50 states and the District of Columbia, at national and state
-#' scope.
+#' Both methods cover census tracts only (ACS 5-year 2011 onwards), because
+#' some of their ACS tables are not published for block groups. They cover the
+#' 50 states and the District of Columbia, at national and state scope. For a
+#' block-group measure, see [getICE()].
 #'
 #' To compute the index yourself, with other options or geographies, use
 #' `ReproducibleNDI::computeNDI()`.
 #'
 #' @inheritParams getYostIndex
 #' @param type The NDI method: `"messer"` (default) or `"powell_wiley"`.
-#' @param geo Geography: `"tract"` (default) or `"block group"` (alias
-#'   `"cbg"`). Only `"tract"` is available for `type = "powell_wiley"`.
+#' @param geo Geography. Only `"tract"` (default) is available for the NDI.
 #' @param version Which version of the score to return:
 #'   * `"raw"`: computed from the ACS estimates as published. Areas with a
 #'     missing component have no score.

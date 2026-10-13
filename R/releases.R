@@ -53,12 +53,14 @@ sdoh_index_spec <- function(index, type = NULL) {
       series = "ndi", has_scope = TRUE,
       prefix = if (type == "messer") "ndi_messer" else "ndi_powellwiley",
       raw = "NDI", best = "NDIImputed",
-      geos = if (type == "messer") c("tract", "block group") else "tract"
+      geos = "tract"
     ),
     ice = list(
       label = "ICE", series = "ice", prefix = "ice", has_scope = FALSE,
       raw = ice_measures(), best = paste0(ice_measures(), "Imputed"),
-      geos = c("tract", "block group")
+      geos = c("tract", "block group"),
+      # Household income by race is not published for block groups.
+      tract_only = c("ICE_wbinc", "ICE_wpcinc")
     ),
     stop("Unknown index: ", index)
   )

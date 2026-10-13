@@ -110,6 +110,9 @@ sdoh_get <- function(index, type = NULL, geo, year, scope = NULL, version, state
   tag_version <- sdoh_release_version(tag)
 
   score_cols <- switch(version, both = c(spec$raw, spec$best), raw = spec$raw, best = spec$best)
+  if (geo == "block group") {
+    score_cols <- setdiff(score_cols, c(spec$tract_only, paste0(spec$tract_only, "Imputed")))
+  }
 
   # 3. One piece per year
   pieces <- lapply(year, function(y) {
@@ -131,5 +134,12 @@ sdoh_get <- function(index, type = NULL, geo, year, scope = NULL, version, state
     out
   })
 
-  sdoh_bind(pieces, geometry)
+  out <- sdoh_bind(pieces, geometry)
+  # Where the scores came from, so that addNtiles() can group them against every
+  # area of the country (or of the state) even after `states` dropped some.
+  attr(out, "sdoh_source") <- list(
+    prefix = spec$prefix, has_scope = spec$has_scope, geo = geo,
+    scope = if (spec$has_scope) scope, release = tag, cache = cache
+  )
+  out
 }

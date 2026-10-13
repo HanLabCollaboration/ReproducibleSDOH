@@ -25,10 +25,10 @@ SCHEMA_VERSION <- 1L
 # environment_setup.sh installs it; run_task.R stops if the installed commit
 # differs from the pin.
 PACKAGE     <- "ReproducibleNDI"
-PACKAGE_REF <- "HanLabCollaboration/ReproducibleNDI@06b5efb"
+PACKAGE_REF <- "HanLabCollaboration/ReproducibleNDI@6ae291e"
 
-# --- Coverage: 106 tasks -------------------------------------------------------
-#   messer:       tract 2011-2024 x 2 scopes = 28; block group 2013-2024 x 2 scopes = 24
+# --- Coverage: 82 tasks --------------------------------------------------------
+#   messer:       tract 2011-2024 x 2 scopes = 28  (its ACS tables stop at tract)
 #   powell_wiley: tract 2011-2024 x 2 scopes = 28  (its ACS tables stop at tract)
 #   ice:          tract 2011-2024 = 14; block group 2013-2024 = 12  (ICE has no scope)
 YEAR_MIN             <- 2011L
@@ -52,7 +52,7 @@ ICE_SCHEMA <- c(
 SERIES <- list(
   messer = list(
     fun         = "computeNDI",
-    geos        = c("tract", "block group"),
+    geos        = c("tract"),
     scopes      = c("national", "state"),
     file_prefix = "ndi_messer",
     schema      = NDI_SCHEMA,

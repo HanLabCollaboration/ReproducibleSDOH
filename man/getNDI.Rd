@@ -21,8 +21,7 @@ getNDI(
 \arguments{
 \item{type}{The NDI method: \code{"messer"} (default) or \code{"powell_wiley"}.}
 
-\item{geo}{Geography: \code{"tract"} (default) or \code{"block group"} (alias
-\code{"cbg"}). Only \code{"tract"} is available for \code{type = "powell_wiley"}.}
+\item{geo}{Geography. Only \code{"tract"} (default) is available for the NDI.}
 
 \item{year}{ACS 5-year year or years, named by the last year of the period
 (\code{2022} is the 2018-2022 ACS). A vector such as \code{2019:2022} returns all
@@ -86,11 +85,10 @@ Messer or the Powell-Wiley method, from the
 \href{https://github.com/HanLabCollaboration/ReproducibleSDOH-data}{ReproducibleSDOH-data}
 repository. No Census API key is needed.
 
-The Messer NDI covers census tracts (ACS 5-year 2011 onwards) and block
-groups (2013 onwards). The Powell-Wiley NDI covers census tracts only,
-because some of its ACS tables are not published for block groups. Both
-cover the 50 states and the District of Columbia, at national and state
-scope.
+Both methods cover census tracts only (ACS 5-year 2011 onwards), because
+some of their ACS tables are not published for block groups. They cover the
+50 states and the District of Columbia, at national and state scope. For a
+block-group measure, see \code{\link[=getICE]{getICE()}}.
 
 To compute the index yourself, with other options or geographies, use
 \code{ReproducibleNDI::computeNDI()}.

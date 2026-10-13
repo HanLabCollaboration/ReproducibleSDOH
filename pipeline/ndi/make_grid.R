@@ -29,11 +29,11 @@ grid$file <- mapply(file_name, grid$series, grid$geo, grid$scope, grid$year, USE
 
 if (pilot) {
   # 2022 only. Tract: every series, with both Messer scopes (the state task
-  # should reuse the national download). Block group: Messer national, to
-  # measure memory and time.
+  # should reuse the national download). Block group: ICE, the only series
+  # there, to measure memory and time.
   keep <- grid$year == 2022L & (
     (grid$geo == "tract" & (grid$series == "messer" | grid$scope %in% c("national", "none"))) |
-    (grid$geo == "block group" & grid$series == "messer" & grid$scope == "national")
+    (grid$geo == "block group" & grid$series == "ice")
   )
   grid <- grid[keep, ]
 }

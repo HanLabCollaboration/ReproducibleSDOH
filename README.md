@@ -21,24 +21,31 @@ library(ReproducibleSDOH)
 # Yost Index for every US census tract, 2018-2022 ACS
 yost <- getYostIndex(geo = "tract", year = 2022, info = FALSE)
 
-# Messer NDI for block groups in California and New York, computed within each state
-ndi <- getNDI(type = "messer", geo = "block group", year = 2022, scope = "state",
+# Messer NDI for census tracts in California and New York, computed within each state
+ndi <- getNDI(type = "messer", geo = "tract", year = 2022, scope = "state",
               states = c("CA", "NY"), info = FALSE)
 
 # The five ICE measures, raw version only, for several years
 ice <- getICE(geo = "tract", year = 2019:2022, version = "raw", info = FALSE)
+
+# Quintiles of the Yost Index (adds YostQuintile and YostStabilizedImputedQuintile),
+# and deciles of the ICE measures, computed within each year
+yost <- addQuintiles(yost)
+ice  <- addNtiles(ice, n = 10)
 ```
 
 | Function | Returns |
 |---|---|
 | `getYostIndex()` | Yost Index: `Yost` (raw) and `YostStabilizedImputed` (best) |
 | `getNDI()` | Neighborhood Deprivation Index, Messer or Powell-Wiley: `NDI` and `NDIImputed` |
-| `getICE()` | Five Index of Concentration at the Extremes measures, raw and imputed |
+| `getICE()` | Index of Concentration at the Extremes measures (five for tracts, three for block groups), raw and imputed |
 | `getGeoInfo()` | Area names, total population and, optionally, boundaries |
+| `addQuintiles()`, `addNtiles(n = )` | The data with a group column per score, such as `YostQuintile`: 1 = lowest scores |
 
 - **No Census API key is needed.** The functions download pre-computed Parquet files from the releases of [ReproducibleSDOH-data](https://github.com/HanLabCollaboration/ReproducibleSDOH-data), verify them against the release's checksums, and cache them (`sdoh_cache_dir()`).
 - **Coverage:** census tracts (2011–2024) and block groups (2013–2024), 50 states and DC, at national and state scope.
 - **`info = TRUE`** (the default) adds each area's name and population, and **`geometry = TRUE`** returns an `sf` object with boundaries. Both need the `geoinfo` and `geometry` releases; until those are published, pass `info = FALSE`.
+- **Groups** (`addQuintiles()`, `addNtiles()`) are computed separately for each year, against every area the scores are relative to: the whole country for `scope = "national"` and for ICE, each state for `scope = "state"`. This holds when you asked for some `states` only: California's national quintiles are its tracts' places among all US tracts.
 - **To compute an index yourself**, with other options or geographies, use the sibling packages listed above.
 
 This repository also holds the **Stanford Sherlock (SLURM) pipeline** that pre-computes every index × geography × scope × year. It lives in `pipeline/` and is not part of the installed package.

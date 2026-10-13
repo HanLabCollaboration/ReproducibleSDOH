@@ -74,14 +74,18 @@ low-income Black households).
 }
 }
 
+For block groups only \code{ICE_inc}, \code{ICE_edu} and \code{ICE_rewb} are returned:
+\code{ICE_wbinc} and \code{ICE_wpcinc} need household income by race, which the ACS
+does not publish for block groups.
+
 Every value lies between -1 (most deprived) and +1 (most privileged).
 
 With \code{geometry = TRUE}, an \code{sf} object with the same columns and a
 \code{geometry} column (NAD83, EPSG:4269).
 }
 \description{
-Downloads the five pre-computed measures of the Index of Concentration at
-the Extremes (ICE) from the
+Downloads the pre-computed measures of the Index of Concentration at the
+Extremes (ICE), five for census tracts and three for block groups, from the
 \href{https://github.com/HanLabCollaboration/ReproducibleSDOH-data}{ReproducibleSDOH-data}
 repository. No Census API key is needed.
 

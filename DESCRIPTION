@@ -27,6 +27,7 @@ Imports:
     tools,
     utils
 Suggests:
+    dplyr,
     sf,
     testthat (>= 3.0.0),
     withr

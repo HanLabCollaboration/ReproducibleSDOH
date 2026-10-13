@@ -1,8 +1,8 @@
 #' Get the pre-computed Index of Concentration at the Extremes
 #'
 #' @description
-#' Downloads the five pre-computed measures of the Index of Concentration at
-#' the Extremes (ICE) from the
+#' Downloads the pre-computed measures of the Index of Concentration at the
+#' Extremes (ICE), five for census tracts and three for block groups, from the
 #' [ReproducibleSDOH-data](https://github.com/HanLabCollaboration/ReproducibleSDOH-data)
 #' repository. No Census API key is needed.
 #'
@@ -35,6 +35,10 @@
 #'         low-income Black households).
 #'       * `ICE_wpcinc`: income among non-Hispanic White households
 #'         (high-income minus low-income).
+#'
+#'   For block groups only `ICE_inc`, `ICE_edu` and `ICE_rewb` are returned:
+#'   `ICE_wbinc` and `ICE_wpcinc` need household income by race, which the ACS
+#'   does not publish for block groups.
 #'
 #'   Every value lies between -1 (most deprived) and +1 (most privileged).
 #'
